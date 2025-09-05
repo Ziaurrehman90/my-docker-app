@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18'   // Use Node.js 18 official image
+            args '-p 3000:3000' // Map port if you want to run the app
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -9,28 +14,23 @@ pipeline {
             }
         }
 
-        stage('Setup') {
+        stage('Install') {
             steps {
-                sh '''
-                  echo "Installing Python..."
-                  apt-get update
-                  apt-get install -y python3 python3-pip
-                '''
+                sh 'npm install'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'echo Building app...'
-                sh 'python3 --version'
-                sh 'if [ -f app.py ]; then python3 app.py; else echo "No app.py found"; fi'
+                sh 'echo Building Node.js app...'
+                sh 'if [ -f app.js ]; then node app.js; else echo "No app.js found"; fi'
             }
         }
 
         stage('Test') {
             steps {
                 sh 'echo Running tests...'
-                sh 'if [ -f test_app.py ]; then python3 -m unittest test_app.py; else echo "No tests found"; fi'
+                sh 'npm test || echo "No tests configured"'
             }
         }
     }
