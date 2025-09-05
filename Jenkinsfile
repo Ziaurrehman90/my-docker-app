@@ -5,16 +5,25 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/Ziaurrehman90/my-docker-app',
-                    credentialsId: 'ecf815ab-0b0f-442a-9767-d2b76edddaf6'
+                    url: 'https://github.com/Ziaurrehman90/my-docker-app'
+            }
+        }
+
+        stage('Setup') {
+            steps {
+                sh '''
+                  echo "Installing Python..."
+                  apt-get update
+                  apt-get install -y python3 python3-pip
+                '''
             }
         }
 
         stage('Build') {
             steps {
                 sh 'echo Building app...'
-                sh 'python3 --version || python --version'
-                sh 'if [ -f app.py ]; then python3 app.py || python app.py; else echo "No app.py found"; fi'
+                sh 'python3 --version'
+                sh 'if [ -f app.py ]; then python3 app.py; else echo "No app.py found"; fi'
             }
         }
 
